@@ -1,0 +1,50 @@
+[
+  {
+    "id": "orders-lookup",
+    "name": "Look up an order by id",
+    "prompt": "Find order A-1042 and tell me its status.",
+    "expected_tool": "get_order",
+    "expected_args": {"order_id": "A-1042"},
+    "must_contain": "shipped"
+  },
+  {
+    "id": "refund-policy",
+    "name": "Answer a policy question from the knowledge base",
+    "prompt": "How many days do customers have to return an unopened item?",
+    "expected_tool": "search_docs",
+    "expected_args": {"query": "return window unopened item"},
+    "must_contain": "30 days"
+  },
+  {
+    "id": "invoice-total",
+    "name": "Sum the open invoices for one customer",
+    "prompt": "What is the total of the open invoices for customer C-88?",
+    "expected_tool": "list_invoices",
+    "expected_args": {"customer_id": "C-88", "status": "open"},
+    "must_contain": "1,240.00"
+  },
+  {
+    "id": "ticket-escalation",
+    "name": "Escalate a ticket that mentions an outage",
+    "prompt": "Ticket T-5512 says the dashboard has been down for an hour. Escalate it to the on-call engineer.",
+    "expected_tool": "escalate_ticket",
+    "expected_args": {"ticket_id": "T-5512", "reason": "outage"},
+    "must_contain": "escalated"
+  },
+  {
+    "id": "no-tool-needed",
+    "name": "Answer a greeting without calling a tool",
+    "prompt": "Hello, what can you help me with today?",
+    "expected_tool": null,
+    "expected_args": {},
+    "must_contain": "orders"
+  },
+  {
+    "id": "missing-order",
+    "name": "Report a missing order instead of inventing one",
+    "prompt": "Look up order A-9999 and tell me its status.",
+    "expected_tool": "get_order",
+    "expected_args": {"order_id": "A-9999"},
+    "must_contain": "not found"
+  }
+]

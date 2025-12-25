@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-eval-harness
+  labels:
+    app.kubernetes.io/name: agent-eval-harness
+    app.kubernetes.io/version: "0.3.0"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: agent-eval-harness
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: agent-eval-harness
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/example/agent-eval-harness:0.3.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: harness-secrets
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: harness-secrets
+                  key: database-url
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-eval-harness
+  labels:
+    app.kubernetes.io/name: agent-eval-harness
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: agent-eval-harness
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
