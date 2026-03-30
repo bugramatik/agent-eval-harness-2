@@ -57,3 +57,47 @@ TOOLS: list[dict[str, Any]] = [
         },
     },
 ]
+
+SYSTEM_PROMPT = (
+    "You are a support assistant. Use the provided tools when they help answer the "
+    "request. Call a tool only when it is needed, pass exact ids, and finish with a short "
+    "answer that states what you did."
+)
+
+
+def _fake_tool_result(name: str, arguments: dict[str, Any]) -> str:
+    """Return a deterministic stand-in result so runs are reproducible without backends."""
+    if name == "lookup_order":
+        return json.dumps(
+            {
+                "order_id": arguments.get("order_id"),
+                "status": "delivered",
+                "total": 84.5,
+                "currency": "EUR",
+            }
+        )
+    if name == "refund_order":
+        return json.dumps(
+            {
+                "order_id": arguments.get("order_id"),
+                "refunded": True,
+                "amount": arguments.get("amount"),
+            }
+        )
+    if name == "search_faq":
+        return json.dumps(
+            {
+                "query": arguments.get("query"),
+                "results": [
+                    {"title": "Return window", "body": "Items can be returned within 30 days."},
+                    {"title": "Refund timing", "body": "Refunds settle in 3 to 5 business days."},
+                ],
+            }
+        )
+    return json.dumps({"error": f"unknown tool {name}"})
+
+
+class ToolCall(BaseModel):
+    name: str
+    arguments: dict[str, Any] = Field(default_factory=dict)
+
