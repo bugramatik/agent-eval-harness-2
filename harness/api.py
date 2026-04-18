@@ -75,3 +75,74 @@ SettingsDep = Annotated[Settings, Depends(get_settings)]
 def on_startup() -> None:
     init_db()
 
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "ok", "version": __version__}
+
+
+async def _execute_run(run_id: int, suite: str, settings: Settings) -> None:
+    try:
+        await run_suite(suite, settings, run_id=run_id)
+    except Exception:  # the run row is marked failed by run_suite when it can
+        logger.exception("run %s failed", run_id)
+
+
+@app.post("/runs", response_model=RunOut, status_code=202)
+def start_run(
+    payload: RunRequest,
+    background: BackgroundTasks,
+    session: SessionDep,
+    settings: SettingsDep,
+) -> Run:
+    run = Run(
+        suite=payload.suite,
+        model=settings.model,
+        prompt_version=payload.prompt_version,
+        status="queued",
+    )
+    session.add(run)
+    session.commit()
+    session.refresh(run)
+    background.add_task(_execute_run, run.id, payload.suite, settings)
+    return run
+
+
+@app.get("/runs", response_model=list[RunOut])
+def list_runs(
+    session: SessionDep,
+    suite: str | None = Query(default=None),
+    limit: int = Query(default=20, ge=1, le=200),
+) -> list[Run]:
+    stmt = select(Run).order_by(Run.id.desc()).limit(limit)
+    if suite:
+        stmt = stmt.where(Run.suite == suite)
+    return list(session.scalars(stmt))
+
+
+@app.get("/runs/{run_id}", response_model=RunDetail)
+def get_run(run_id: int, session: SessionDep) -> Run:
+    run = session.get(Run, run_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail=f"run {run_id} not found")
+    return run
+
+
+@app.get("/runs/{run_id}/results", response_model=list[ResultOut])
+def get_results(run_id: int, session: SessionDep) -> list[TaskResult]:
+    if session.get(Run, run_id) is None:
+        raise HTTPException(status_code=404, detail=f"run {run_id} not found")
+    stmt = select(TaskResult).where(TaskResult.run_id == run_id).order_by(TaskResult.id)
+    return list(session.scalars(stmt))
+
+
+@app.get("/compare", response_model=list[RegressionOut])
+def compare(
+    session: SessionDep,
+    baseline: int = Query(..., ge=1),
+    candidate: int = Query(..., ge=1),
+) -> list[dict]:
+    for run_id in (baseline, candidate):
+        if session.get(Run, run_id) is None:
+            raise HTTPException(status_code=404, detail=f"run {run_id} not found")
+    return compare_runs(baseline, candidate, session=session)
