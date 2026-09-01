@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Eval Harness</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --ink: #1c2024;
+    --muted: #6b7280;
+    --line: #e3e6ea;
+    --accent: #2f6feb;
+    --accent-soft: #e8effd;
+    --pass: #1f8a4c;
+    --pass-soft: #e6f4ec;
+    --fail: #b42318;
+    --fail-soft: #fdecea;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 0 24px;
+    height: 56px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
+  .mark {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: var(--accent); color: #fff;
+    display: grid; place-items: center; font-size: 12px; font-weight: 700;
+  }
+  nav { display: flex; gap: 4px; }
+  nav a {
+    color: var(--muted); text-decoration: none; padding: 6px 10px; border-radius: 6px; font-weight: 500;
+  }
+  nav a.active { color: var(--accent); background: var(--accent-soft); }
+  .spacer { flex: 1; }
+  .pill {
+    font-size: 12px; color: var(--muted); border: 1px solid var(--line);
+    padding: 4px 10px; border-radius: 999px; background: #fbfbfc;
+  }
+  main { padding: 20px 24px 32px; max-width: 1280px; margin: 0 auto; }
+  .row { display: grid; gap: 16px; }
+  .cards { grid-template-columns: repeat(4, 1fr); }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  }
+  .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .card .value { font-size: 26px; font-weight: 650; margin-top: 6px; letter-spacing: -.01em; }
+  .card .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .split { grid-template-columns: 1.55fr 1fr; margin-top: 16px; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px;
+  }
+  .panel h2 { font-size: 14px; margin: 0 0 2px; font-weight: 600; }
+  .panel .hint { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+    color: var(--muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--line);
+  }
+  td { padding: 8px; border-bottom: 1px solid #f0f2f4; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+  }
+  .tag.pass { color: var(--pass); background: var(--pass-soft); }
+  .tag.fail { color: var(--fail); background: var(--fail-soft); }
+  .bar { height: 6px; border-radius: 3px; background: #eef0f3; overflow: hidden; width: 90px; }
+  .bar > span { display: block; height: 100%; background: var(--accent); }
+  .bar.fail > span { background: var(--fail); }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .regress { display: flex; flex-direction: column; gap: 10px; }
+  .regress .item { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .regress .item .top { display: flex; justify-content: space-between; align-items: center; }
+  .regress .item .why { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .delta { font-weight: 600; font-size: 12px; }
+  .delta.down { color: var(--fail); }
+  .delta.up { color: var(--pass); }
+  footer { color: var(--muted); font-size: 12px; margin-top: 18px; display: flex; gap: 18px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="mark">AE</span> Agent Eval Harness</div>
+  <nav>
+    <a href="#" class="active">Runs</a>
+    <a href="#">Suites</a>
+    <a href="#">Compare</a>
+    <a href="#">Settings</a>
+  </nav>
+  <div class="spacer"></div>
+  <span class="pill">model gpt-4.1-mini</span>
+  <span class="pill">prompt v7</span>
+</header>
