@@ -163,3 +163,49 @@
     <span>Health ok</span>
   </footer>
 </main>
+
+<script>
+  const results = [
+    { id: "t-001", name: "lookup_customer", tool: "get_customer", score: 1.0, judge: "Correct tool and arguments.", pass: true },
+    { id: "t-002", name: "refund_order", tool: "issue_refund", score: 0.9, judge: "Refund issued, amount rounded.", pass: true },
+    { id: "t-003", name: "list_open_tickets", tool: "search_tickets", score: 1.0, judge: "Filter matched the request.", pass: true },
+    { id: "t-004", name: "update_address", tool: "update_customer", score: 0.4, judge: "Called the right tool with a stale id.", pass: false },
+    { id: "t-005", name: "summarize_invoice", tool: "get_invoice", score: 0.8, judge: "Answer missed the due date.", pass: true },
+    { id: "t-006", name: "escalate_ticket", tool: "assign_ticket", score: 0.2, judge: "No tool call, answered in prose.", pass: false },
+    { id: "t-007", name: "check_stock", tool: "get_inventory", score: 1.0, judge: "Exact match on sku and region.", pass: true },
+    { id: "t-008", name: "cancel_subscription", tool: "cancel_plan", score: 0.7, judge: "Cancelled but skipped confirmation.", pass: true }
+  ];
+
+  const regressions = [
+    { id: "t-004", name: "update_address", delta: "-0.5", why: "Arguments changed after prompt v7." },
+    { id: "t-006", name: "escalate_ticket", delta: "-0.8", why: "Model stopped calling the tool." },
+    { id: "t-019", name: "bulk_export", delta: "-0.3", why: "Answer no longer names the file." },
+    { id: "t-033", name: "apply_discount", delta: "-0.4", why: "Wrong currency in arguments." }
+  ];
+
+  const rows = document.getElementById("results");
+  results.forEach(function (r) {
+    const tr = document.createElement("tr");
+    const pct = Math.round(r.score * 100);
+    tr.innerHTML =
+      '<td><div class="mono">' + r.id + '</div><div style="color:var(--muted);font-size:12px">' + r.name + '</div></td>' +
+      '<td class="mono">' + r.tool + '</td>' +
+      '<td><div style="display:flex;align-items:center;gap:8px"><div class="bar' + (r.pass ? '' : ' fail') + '"><span style="width:' + pct + '%"></span></div><span class="mono">' + r.score.toFixed(1) + '</span></div></td>' +
+      '<td style="color:var(--muted);font-size:12px">' + r.judge + '</td>' +
+      '<td><span class="tag ' + (r.pass ? 'pass' : 'fail') + '">' + (r.pass ? 'pass' : 'fail') + '</span></td>';
+    rows.appendChild(tr);
+  });
+
+  const box = document.getElementById("regress");
+  regressions.forEach(function (g) {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML =
+      '<div class="top"><span class="mono">' + g.id + ' &middot; ' + g.name + '</span>' +
+      '<span class="delta down">' + g.delta + '</span></div>' +
+      '<div class="why">' + g.why + '</div>';
+    box.appendChild(div);
+  });
+</script>
+</body>
+</html>
