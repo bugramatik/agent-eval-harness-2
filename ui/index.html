@@ -108,3 +108,58 @@
   <span class="pill">model gpt-4.1-mini</span>
   <span class="pill">prompt v7</span>
 </header>
+
+<main>
+  <div class="row cards">
+    <div class="card">
+      <div class="label">Pass rate</div>
+      <div class="value">94.2%</div>
+      <div class="sub">120-task suite, tuned prompt</div>
+    </div>
+    <div class="card">
+      <div class="label">Wall time</div>
+      <div class="value">38 s</div>
+      <div class="sub">full suite against the model</div>
+    </div>
+    <div class="card">
+      <div class="label">Regressions</div>
+      <div class="value">11</div>
+      <div class="sub">caught against baseline run 41</div>
+    </div>
+    <div class="card">
+      <div class="label">Manual reviews</div>
+      <div class="value">3x</div>
+      <div class="sub">fewer per prompt change</div>
+    </div>
+  </div>
+
+  <div class="row split">
+    <section class="panel">
+      <h2>Run 42 &middot; suite growth-tools</h2>
+      <div class="hint">Started 09:41, finished 09:42. Baseline run 41 scored 91.7%.</div>
+      <table>
+        <thead>
+          <tr><th>Task</th><th>Tool call</th><th>Score</th><th>Judge</th><th>Status</th></tr>
+        </thead>
+        <tbody id="results"></tbody>
+      </table>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--accent)"></span>score from checks and judge</span>
+        <span><span class="dot" style="background:var(--fail)"></span>regressed against baseline</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Regressions vs baseline</h2>
+      <div class="hint">11 tasks dropped below their baseline result.</div>
+      <div class="regress" id="regress"></div>
+    </section>
+  </div>
+
+  <footer>
+    <span>Suite growth-tools v3</span>
+    <span>Judge gpt-4.1</span>
+    <span>Postgres harness</span>
+    <span>Health ok</span>
+  </footer>
+</main>
